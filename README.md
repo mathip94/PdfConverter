@@ -5,7 +5,7 @@ Una aplicación web moderna que permite extraer texto de PDFs escaneados e imág
 ## 🌟 Características
 
 - **Soporte múltiples formatos**: PDF, JPG, PNG, GIF, BMP, TIFF
-- **OCR avanzado**: Utiliza Tesseract con preprocesamiento de imágenes
+- **OCR**: Utiliza Tesseract con preprocesamiento de imágenes
 - **Preservación de formato**: Mantiene espaciado, párrafos y estructura original
 - **Interfaz moderna**: Drag & drop, barra de progreso, descarga automática
 - **Procesamiento inteligente**: Detecta PDFs con texto vs. PDFs escaneados
@@ -204,36 +204,3 @@ PdfConverter/
 - La imagen debe tener buen contraste entre texto y fondo
 - Evitar imágenes con mucho ruido o distorsión
 
-## 🔮 Próximas Funciones
-
-- [ ] Procesamiento por lotes múltiples archivos
-- [ ] API REST para integración con otras aplicaciones
-- [ ] Soporte para más idiomas OCR
-- [ ] Detección automática de idioma
-- [ ] Mejoras en preservación de formato para tablas
-
-## 📄 Licencia
-
-Este proyecto está bajo licencia MIT. Ver archivo LICENSE para más detalles.
-
-## 🤝 Contribuciones
-
-Las contribuciones son bienvenidas. Por favor:
-
-1. Fork el proyecto
-2. Crea una rama para tu función (`git checkout -b feature/nueva-funcion`)
-3. Commit tus cambios (`git commit -am 'Agregar nueva función'`)
-4. Push a la rama (`git push origin feature/nueva-funcion`)
-5. Crea un Pull Request
-
-## 📞 Soporte
-
-Si encuentras algún problema o tienes preguntas:
-
-1. Revisa la sección de solución de problemas
-2. Verifica que todas las dependencias estén instaladas correctamente
-3. Crea un issue en el repositorio con detalles del problema
-
----
-
-*Desarrollado con ❤️ usando Flask, Tesseract OCR y tecnologías web modernas* 
