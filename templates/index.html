@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDF to Plain Text Extractor</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #2d3748 0%, #4a5568 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 1.1rem;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            padding: 30px;
+        }
+
+        .upload-section {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .upload-zone {
+            border: 3px dashed #cbd5e0;
+            border-radius: 15px;
+            padding: 50px 20px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            background: white;
+        }
+
+        .upload-zone:hover,
+        .upload-zone.dragover {
+            border-color: #667eea;
+            background: #f0f4ff;
+            transform: translateY(-2px);
+        }
+
+        .upload-icon {
+            font-size: 4rem;
+            color: #cbd5e0;
+            margin-bottom: 20px;
+            transition: color 0.3s ease;
+        }
+
+        .upload-zone:hover .upload-icon {
+            color: #667eea;
+        }
+
+        .upload-text {
+            font-size: 1.2rem;
+            color: #4a5568;
+            margin-bottom: 15px;
+        }
+
+        .file-types {
+            font-size: 0.9rem;
+            color: #718096;
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 25px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .results-section {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 30px;
+            position: relative;
+        }
+
+        .results-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .results-title {
+            font-size: 1.5rem;
+            color: #2d3748;
+        }
+
+        .download-btn {
+            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+            padding: 10px 20px;
+            font-size: 0.9rem;
+        }
+
+        .text-output {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 20px;
+            min-height: 400px;
+            max-height: 500px;
+            overflow-y: auto;
+            font-family: 'Courier New', monospace;
+            line-height: 1.6;
+            white-space: pre-wrap;
+            color: #2d3748;
+        }
+
+        .placeholder {
+            color: #a0aec0;
+            font-style: italic;
+            text-align: center;
+            margin-top: 150px;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 50px;
+        }
+
+        .loading.show {
+            display: block;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: #e2e8f0;
+            border-radius: 3px;
+            overflow: hidden;
+            margin-top: 20px;
+            display: none;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .error {
+            background: #fed7d7;
+            color: #c53030;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .success {
+            background: #c6f6d5;
+            color: #276749;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .file-info {
+            background: #e6fffa;
+            color: #234e52;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 20px 0;
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+                gap: 20px;
+                padding: 20px;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .upload-zone {
+                padding: 30px 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1><i class="fas fa-file-text"></i> PDF to Plain Text</h1>
+            <p>Extrae texto de PDFs escaneados e imágenes manteniendo el formato original</p>
+        </header>
+
+        <main class="main-content">
+            <section class="upload-section">
+                <h2 style="margin-bottom: 20px; color: #2d3748;">
+                    <i class="fas fa-cloud-upload-alt"></i> Subir Archivo
+                </h2>
+                
+                <div class="error" id="errorMessage"></div>
+                <div class="success" id="successMessage"></div>
+                <div class="file-info" id="fileInfo"></div>
+
+                <div class="upload-zone" id="uploadZone">
+                    <i class="fas fa-cloud-upload-alt upload-icon"></i>
+                    <div class="upload-text">
+                        Arrastra tu archivo aquí o haz clic para seleccionar
+                    </div>
+                    <div class="file-types">
+                        Formatos soportados: PDF, JPG, PNG, GIF, BMP, TIFF
+                    </div>
+                </div>
+
+                <input type="file" id="fileInput" class="file-input" accept=".pdf,.jpg,.jpeg,.png,.gif,.bmp,.tiff">
+                
+                <button class="btn" id="uploadBtn">
+                    <i class="fas fa-upload"></i>
+                    Procesar Archivo
+                </button>
+
+                <div class="progress-bar" id="progressBar">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+
+                <div class="loading" id="loading">
+                    <div class="spinner"></div>
+                    <p>Procesando archivo... Por favor espera.</p>
+                </div>
+            </section>
+
+            <section class="results-section">
+                <div class="results-header">
+                    <h2 class="results-title">
+                        <i class="fas fa-align-left"></i> Texto Extraído
+                    </h2>
+                    <button class="btn download-btn" id="downloadBtn" style="display: none;">
+                        <i class="fas fa-download"></i>
+                        Descargar
+                    </button>
+                </div>
+
+                <div class="text-output" id="textOutput">
+                    <div class="placeholder">
+                        El texto extraído aparecerá aquí...
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        // DOM Elements
+        const uploadZone = document.getElementById('uploadZone');
+        const fileInput = document.getElementById('fileInput');
+        const uploadBtn = document.getElementById('uploadBtn');
+        const textOutput = document.getElementById('textOutput');
+        const loading = document.getElementById('loading');
+        const progressBar = document.getElementById('progressBar');
+        const progressFill = document.getElementById('progressFill');
+        const downloadBtn = document.getElementById('downloadBtn');
+        const errorMessage = document.getElementById('errorMessage');
+        const successMessage = document.getElementById('successMessage');
+        const fileInfo = document.getElementById('fileInfo');
+
+        let selectedFile = null;
+        let extractedText = '';
+
+        // Event Listeners
+        uploadZone.addEventListener('click', () => fileInput.click());
+        uploadZone.addEventListener('dragover', handleDragOver);
+        uploadZone.addEventListener('dragleave', handleDragLeave);
+        uploadZone.addEventListener('drop', handleDrop);
+        fileInput.addEventListener('change', handleFileSelect);
+        uploadBtn.addEventListener('click', uploadFile);
+        downloadBtn.addEventListener('click', downloadText);
+
+        // Drag and Drop Handlers
+        function handleDragOver(e) {
+            e.preventDefault();
+            uploadZone.classList.add('dragover');
+        }
+
+        function handleDragLeave(e) {
+            e.preventDefault();
+            uploadZone.classList.remove('dragover');
+        }
+
+        function handleDrop(e) {
+            e.preventDefault();
+            uploadZone.classList.remove('dragover');
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                selectFile(files[0]);
+            }
+        }
+
+        function handleFileSelect(e) {
+            if (e.target.files.length > 0) {
+                selectFile(e.target.files[0]);
+            }
+        }
+
+        function selectFile(file) {
+            // Validate file type
+            const allowedTypes = ['application/pdf', 'image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/bmp', 'image/tiff'];
+            if (!allowedTypes.includes(file.type) && !file.name.toLowerCase().match(/\.(pdf|jpg|jpeg|png|gif|bmp|tiff)$/)) {
+                showError('Tipo de archivo no permitido. Por favor selecciona un PDF o imagen.');
+                return;
+            }
+
+            // Validate file size (16MB max)
+            if (file.size > 16 * 1024 * 1024) {
+                showError('El archivo es demasiado grande. Máximo 16MB.');
+                return;
+            }
+
+            selectedFile = file;
+            uploadBtn.disabled = false;
+            
+            showFileInfo(`Archivo seleccionado: ${file.name} (${formatFileSize(file.size)})`);
+            hideError();
+        }
+
+        function uploadFile() {
+            if (!selectedFile) {
+                showError('Por favor selecciona un archivo primero.');
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('file', selectedFile);
+
+            // Show loading state
+            loading.classList.add('show');
+            uploadBtn.disabled = true;
+            progressBar.style.display = 'block';
+            hideError();
+            hideSuccess();
+
+            // Simulate progress
+            let progress = 0;
+            const progressInterval = setInterval(() => {
+                progress += Math.random() * 30;
+                if (progress > 90) progress = 90;
+                progressFill.style.width = progress + '%';
+            }, 500);
+
+            fetch('/upload', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                clearInterval(progressInterval);
+                progressFill.style.width = '100%';
+                
+                setTimeout(() => {
+                    loading.classList.remove('show');
+                    progressBar.style.display = 'none';
+                    progressFill.style.width = '0%';
+                    uploadBtn.disabled = false;
+
+                    if (data.success) {
+                        extractedText = data.text;
+                        displayText(extractedText);
+                        downloadBtn.style.display = 'inline-flex';
+                        showSuccess(`Texto extraído exitosamente de: ${data.filename}`);
+                    } else {
+                        showError(data.error || 'Error al procesar el archivo.');
+                    }
+                }, 1000);
+            })
+            .catch(error => {
+                clearInterval(progressInterval);
+                console.error('Error:', error);
+                loading.classList.remove('show');
+                progressBar.style.display = 'none';
+                progressFill.style.width = '0%';
+                uploadBtn.disabled = false;
+                showError('Error de conexión. Por favor intenta de nuevo.');
+            });
+        }
+
+        function displayText(text) {
+            textOutput.innerHTML = text || '<div class="placeholder">No se pudo extraer texto del archivo.</div>';
+        }
+
+        function downloadText() {
+            if (!extractedText) return;
+
+            const blob = new Blob([extractedText], { type: 'text/plain;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `extracted_text_${new Date().getTime()}.txt`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        function showError(message) {
+            errorMessage.textContent = message;
+            errorMessage.style.display = 'block';
+        }
+
+        function hideError() {
+            errorMessage.style.display = 'none';
+        }
+
+        function showSuccess(message) {
+            successMessage.textContent = message;
+            successMessage.style.display = 'block';
+        }
+
+        function hideSuccess() {
+            successMessage.style.display = 'none';
+        }
+
+        function showFileInfo(message) {
+            fileInfo.textContent = message;
+            fileInfo.style.display = 'block';
+        }
+
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+    </script>
+</body>
+</html> 

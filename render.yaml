@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: pdf-to-text-app
+    env: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: python app.py
+    envVars:
+      - key: FLASK_ENV
+        value: production
+    disk:
+      name: uploads
+      mountPath: /app/uploads
+      sizeGB: 1 
