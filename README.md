@@ -1,4 +1,4 @@
-# PDF to Plain Text Extractor
+# PdfConverter - PDF to Text Converter with OCR
 
 Una aplicación web moderna que permite extraer texto de PDFs escaneados e imágenes manteniendo el formato original, utilizando tecnologías de OCR (Optical Character Recognition).
 
@@ -72,7 +72,8 @@ Una aplicación web moderna que permite extraer texto de PDFs escaneados e imág
 
 1. **Clonar/Descargar el proyecto**
    ```bash
-   cd PdfToPlainText
+   git clone https://github.com/mathip94/PdfConverter.git
+   cd PdfConverter
    ```
 
 2. **Crear entorno virtual (recomendado)**
@@ -124,28 +125,11 @@ EXPOSE 5000
 CMD ["python", "app.py"]
 ```
 
-#### Opción 2: Heroku (con buildpacks)
-
-```bash
-# Crear archivos de configuración:
-echo "python-3.9.0" > runtime.txt
-echo "web: python app.py" > Procfile
-
-# Crear heroku-buildpacks.txt
-echo "https://github.com/heroku/heroku-buildpack-apt" > .buildpacks
-echo "heroku/python" >> .buildpacks
-
-# Crear Aptfile para dependencias del sistema
-echo "tesseract-ocr" > Aptfile
-echo "tesseract-ocr-spa" >> Aptfile
-echo "poppler-utils" >> Aptfile
-```
-
-#### Opción 3: Railway/Render (más fácil)
+#### Opción 2: Railway/Render (más fácil)
 
 Simplemente conectar el repositorio Git y la plataforma instalará automáticamente las dependencias.
 
-#### Opción 4: Azure/AWS/GCP
+#### Opción 3: Azure/AWS/GCP
 
 Usar servicios de OCR en la nube para evitar instalar Tesseract:
 - **Azure Computer Vision API**
@@ -187,7 +171,7 @@ custom_config = r'--oem 3 --psm 6 -l eng+spa+fra'  # Agregar más idiomas
 ## 🏗️ Estructura del Proyecto
 
 ```
-PdfToPlainText/
+PdfConverter/
 ├── app.py              # Aplicación Flask principal
 ├── requirements.txt    # Dependencias Python
 ├── README.md          # Este archivo
@@ -196,18 +180,8 @@ PdfToPlainText/
 │   └── index.html    # Interfaz web
 ├── uploads/          # Archivos subidos (temporal)
 ├── temp/            # Archivos temporales
-├── backend/         # Scripts backend adicionales
-├── frontend/        # Assets frontend adicionales
 └── static/          # Archivos estáticos (CSS, JS, imágenes)
 ```
-
-## 🧪 Testing
-
-Para probar la aplicación con archivos de ejemplo:
-
-1. Crear una imagen con texto usando cualquier herramienta
-2. Subir la imagen a través de la interfaz web
-3. Verificar que el texto se extrae correctamente
 
 ## 🐛 Solución de Problemas
 
